@@ -213,14 +213,14 @@ export default function Home() {
       </Head>
       <div className={styles.main}>
         <div>
-          <h1 className={styles.title}>Ethereum Staking Platform!</h1>
+          <h1 className={styles.title}>MATIC Staking Platform!</h1>
           <div className={styles.description}>
-            User can stake MATIC and after Unstaking user will get Rewarded in Native Token based on the Staking Time.
+            User can stake MATIC and upon Unstaking, users will get Rewarded in Native Token based on the Staking Time.
           </div>
           {
             !stakedETH ? (
               <div className={styles.textbox}>
-                <br /><input onChange={(e) => setStakingValue(e.target.value)} className={styles.text} type="number" /><br />
+                <br /><input onChange={(e) => setStakingValue(e.target.value)} className={styles.text} type="number" placeholder="MATIC to Stake" /><br />
               </div>
             ) : null
           }
