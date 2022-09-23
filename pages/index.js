@@ -108,7 +108,7 @@ export default function Home() {
       setStakedETH(false);
     } catch (err) {
       console.log(err);
-      alert(err.error.message);
+      alert(err);
 
     }
   };
