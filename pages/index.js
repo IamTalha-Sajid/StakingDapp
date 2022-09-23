@@ -7,11 +7,12 @@ import { useEffect, useRef, useState } from "react";
 import { CONTRACT_ADDRESS, abi } from "../constants";
 
 export default function Home() {
- 
+
   const [walletConnected, setWalletConnected] = useState(false);
   const [stakedETH, setStakedETH] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stakingValue, setStakingValue] = useState(false);
+  const [clickedButton, setClickedButton] = useState(false);
   const web3ModalRef = useRef();
 
   const getProviderOrSigner = async (needSigner = false) => {
@@ -65,7 +66,7 @@ export default function Home() {
   const stakeETH = async (amount) => {
     try {
 
-      if(!amount) {
+      if (!amount) {
         return alert('Please add value to stake')
       }
       const signer = await getProviderOrSigner(true);
@@ -83,6 +84,7 @@ export default function Home() {
       await tx.wait();
       setLoading(false);
       setStakedETH(true);
+      setClickedButton(false);
     } catch (err) {
       console.error(err);
     }
@@ -99,18 +101,25 @@ export default function Home() {
 
       const tx = await tokenContract.unStake();
       setLoading(true);
+      clickedButtonStateTrue()
 
       await tx.wait();
       setLoading(false);
       setStakedETH(false);
     } catch (err) {
-      console.error(err);
+      console.log(err);
+      alert(err);
+
     }
+  };
+
+  const clickedButtonStateTrue = async () => {
+    setClickedButton(true);
   };
 
   const checkIfAddressStaked = async () => {
     try {
-      
+
       const signer = await getProviderOrSigner(true);
       const tokenContract = new Contract(
         CONTRACT_ADDRESS,
@@ -125,10 +134,16 @@ export default function Home() {
     }
   };
 
- 
+
   const connectWallet = async () => {
     try {
-     
+
+      web3ModalRef.current = new Web3Modal({
+        network: "mumbai",
+        providerOptions: {},
+        disableInjectedProvider: false,
+      })
+
       await getProviderOrSigner();
       setWalletConnected(true);
 
@@ -142,7 +157,9 @@ export default function Home() {
     if (walletConnected) {
       if (stakedETH) {
         return (
-          <button onClick={unStakeETH} className={styles.button}>
+          <button onClick={() => {
+            unStakeETH()
+          }} className={styles.button} disabled={clickedButton ? true : false}>
             Unstake ETH
           </button>
         );
@@ -150,9 +167,9 @@ export default function Home() {
         return <button className={styles.button}>Loading...</button>;
       } else {
         return (
-          <button onClick={() => stakeETH(stakingValue)} 
-          // disabled={!stakingValue?true:false} 
-          className={styles.button}>
+          <button onClick={() => stakeETH(stakingValue)}
+            // disabled={!stakingValue?true:false} 
+            className={styles.button}>
             Stake ETH
           </button>
         );
@@ -191,18 +208,18 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (!walletConnected) {
-     
-      web3ModalRef.current = new Web3Modal({
-        network: "mumbai",
-        providerOptions: {},
-        disableInjectedProvider: false,
-      });
-      connectWallet();
-    }
-  }, [walletConnected]);
+  //   if (!walletConnected) {
+
+  //     web3ModalRef.current = new Web3Modal({
+  //       network: "mumbai",
+  //       providerOptions: {},
+  //       disableInjectedProvider: false,
+  //     });
+  //     connectWallet();
+  //   }
+  // }, [walletConnected]);
 
   return (
     <div>
@@ -218,10 +235,10 @@ export default function Home() {
             User can stake MATIC and upon Unstaking, users will get Rewarded in Native Token based on the Staking Time.
           </div>
           {
-            !stakedETH ? (
-              <div className={styles.textbox}>
-                <br /><input onChange={(e) => setStakingValue(e.target.value)} className={styles.text} type="number" placeholder="MATIC to Stake" /><br />
-              </div>
+            !stakedETH && walletConnected ? (
+              <>
+                <input onChange={(e) => setStakingValue(e.target.value)} className={styles.text} type="number" placeholder="MATIC to Stake" /><br />
+              </>
             ) : null
           }
 
