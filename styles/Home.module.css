@@ -57,9 +57,9 @@
 }
 
 .button:disabled{
-  border: 1px solid #000000;
+  border: 1px solid #665e5e;
   background-color: #51a2ff;
-  color: #000000;
+  color: #665e5e;
 }
 
 
